@@ -160,7 +160,7 @@ function App() {
           {project && <div className="project-result" aria-live="polite">
             <div className="eyebrow">VOTRE FICHE D’INSPIRATION {project.generatedByAI ? "· IA" : "· DÉMO"}</div>
             <h3>{project.room} · style {project.style}</h3>
-            {project.photoUrl && <div className="generated-photo-wrap"><img className="generated-photo" src={project.photoUrl} alt={'Photo d’inspiration IA pour ' + project.room + ', style ' + project.style} /><a className="button button-outline photo-download" href={project.photoUrl} download={'decoia-' + project.room.toLowerCase().replace(/\\s+/g, '-') + '.jpg'}>Télécharger la photo</a></div>}
+            {project.photoUrl && <div className="generated-photo-wrap"><img className="generated-photo" src={project.photoUrl} alt={'Photo d’inspiration IA pour ' + project.room + ', style ' + project.style} /><a className="button button-outline photo-download" href={project.photoUrl} download={'decoia-' + project.room.toLowerCase().replaceAll(' ', '-') + '.jpg'}>Télécharger la photo</a></div>}
             <p><strong>Direction déco</strong><br/>{project.advice}</p>
             <p><strong>Conseil budget — {project.budget}</strong><br/>{project.budgetAdvice}</p>
             {project.palette && <p><strong>Palette de couleurs suggérée</strong><br/>{project.palette}</p>}{project.layoutTips && <p><strong>Agencement conseillé</strong><br/>{project.layoutTips}</p>}{project.shoppingList && <p><strong>Liste d’idées à prévoir</strong><br/>{project.shoppingList}</p>}{project.description && <p><strong>Vos envies</strong><br/>{project.description}</p>}
