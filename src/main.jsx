@@ -9,6 +9,7 @@ function App() {
   const [budget, setBudget] = useState('Modéré');
   const [description, setDescription] = useState('');
   const [notice, setNotice] = useState('');
+  const [isGenerating, setIsGenerating] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
   const [accountEmail, setAccountEmail] = useState('');
   const [accountNotice, setAccountNotice] = useState('');
@@ -35,9 +36,11 @@ function App() {
     try { localStorage.setItem('decoia-saved-projects', JSON.stringify(next)); } catch {}
   }
 
-  function submitIdea(e) {
+  async function submitIdea(e) {
     e.preventDefault();
-    const suggestions = {
+    setIsGenerating(true);
+    setNotice('Préparation de votre projet…');
+    const fallback = {
       Japandi: 'Associez bois clair, lignes simples, textiles naturels et quelques objets artisanaux. Gardez des surfaces dégagées pour une ambiance calme.',
       Scandinave: 'Privilégiez des tons lumineux, du bois naturel, des textiles doux et un éclairage chaleureux. Ajoutez quelques touches végétales.',
       Contemporain: 'Misez sur une palette de deux ou trois couleurs, des meubles aux formes nettes et un éclairage en plusieurs points.',
@@ -51,8 +54,23 @@ function App() {
       'Confortable': 'Vous pouvez envisager une pièce maîtresse de qualité, un éclairage travaillé et des rangements mieux adaptés.',
       'Je ne sais pas encore': 'Avancez par étapes : définissez les priorités, mesurez la pièce et comparez les options avant tout achat.'
     };
-    setProject({ room, style, budget, description, advice: suggestions[style], budgetAdvice: budgets[budget] });
-    setNotice('Votre fiche d’inspiration est prête. Ces conseils sont préparés dans le navigateur, pas générés par une IA.');
+    try {
+      const response = await fetch('/api/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ room, style, budget, description })
+      });
+      if (!response.ok) throw new Error('API indisponible');
+      const data = await response.json();
+      if (!data || !data.advice) throw new Error('Réponse IA incomplète');
+      setProject({ room, style, budget, description, advice: data.advice, budgetAdvice: data.budgetAdvice || budgets[budget], palette: data.palette || '', layoutTips: data.layoutTips || '', shoppingList: data.shoppingList || '', generatedByAI: true });
+      setNotice('Votre proposition a été générée par l’IA. Vérifiez toujours les mesures et la faisabilité avant tout achat.');
+    } catch {
+      setProject({ room, style, budget, description, advice: fallback[style], budgetAdvice: budgets[budget], palette: '', layoutTips: '', shoppingList: '', generatedByAI: false });
+      setNotice('Le service IA n’est pas encore connecté à cet hébergement. Voici une fiche de conseils de démonstration ; aucune réponse IA réelle n’a été générée.');
+    } finally {
+      setIsGenerating(false);
+    }
   }
 
   return <div className="app">
@@ -78,7 +96,7 @@ function App() {
           <label htmlFor="quick-style">Style</label><select id="quick-style" value={style} onChange={e=>setStyle(e.target.value)}>{styles.map(x=><option key={x}>{x}</option>)}</select>
           <label htmlFor="quick-budget">Budget</label><select id="quick-budget" value={budget} onChange={e=>setBudget(e.target.value)}><option>Petit budget</option><option>Modéré</option><option>Confortable</option><option>Je ne sais pas encore</option></select>
           <label htmlFor="quick-description">Vos envies</label><textarea id="quick-description" rows="2" value={description} onChange={e=>setDescription(e.target.value)} placeholder="Couleurs, matières, besoins…"/>
-          <button className="button button-primary submit" type="submit">Générer ma fiche déco ↗</button>
+          <button className="button button-primary submit" type="submit">{isGenerating ? "Génération en cours…" : "Générer ma fiche déco ↗"}</button>
           <small className="hero-form-foot">Conseils personnalisés · Sans paiement</small>
         </form>
       </section>
@@ -110,14 +128,14 @@ function App() {
           <select id="budget" value={budget} onChange={e=>setBudget(e.target.value)}><option>Petit budget</option><option>Modéré</option><option>Confortable</option><option>Je ne sais pas encore</option></select>
           <label htmlFor="description">Décrivez votre pièce et vos envies <span className="optional">Facultatif</span></label>
           <textarea id="description" rows="3" value={description} onChange={e=>setDescription(e.target.value)} placeholder="Ex. : salon lumineux, bois clair, rangements discrets, ambiance apaisante…"/>
-          <button className="button button-primary submit" type="submit">Préparer mon idée <span>↗</span></button>
+          <button className="button button-primary submit" type="submit">{isGenerating ? "Génération en cours…" : "Générer avec l’IA"} <span>↗</span></button>
           {notice && <div className="notice" role="status">{notice}</div>}
           {project && <div className="project-result" aria-live="polite">
-            <div className="eyebrow">VOTRE FICHE D’INSPIRATION</div>
+            <div className="eyebrow">VOTRE FICHE D’INSPIRATION {project.generatedByAI ? "· IA" : "· DÉMO"}</div>
             <h3>{project.room} · style {project.style}</h3>
             <p><strong>Direction déco</strong><br/>{project.advice}</p>
             <p><strong>Conseil budget — {project.budget}</strong><br/>{project.budgetAdvice}</p>
-            {project.description && <p><strong>Vos envies</strong><br/>{project.description}</p>}
+            {project.palette && <p><strong>Palette de couleurs suggérée</strong><br/>{project.palette}</p>}{project.layoutTips && <p><strong>Agencement conseillé</strong><br/>{project.layoutTips}</p>}{project.shoppingList && <p><strong>Liste d’idées à prévoir</strong><br/>{project.shoppingList}</p>}{project.description && <p><strong>Vos envies</strong><br/>{project.description}</p>}
             <div className="result-actions"><button className="button button-primary" type="button" onClick={saveProject}>Enregistrer ce projet</button><button className="button button-outline" type="button" onClick={() => window.print()}>Imprimer / enregistrer en PDF</button></div>
           </div>}
           {savedProjects.length > 0 && <div className="saved-projects"><div className="eyebrow">MES PROJETS ENREGISTRÉS</div><p className="saved-note">Enregistrés uniquement dans ce navigateur, sur cet appareil.</p>{savedProjects.map(item => <div className="saved-project" key={item.id}><div><strong>{item.room} · {item.style}</strong><small>{item.budget} · enregistré le {item.savedAt}</small></div><button className="text-button" type="button" onClick={() => { setProject(item); setRoom(item.room); setStyle(item.style); setBudget(item.budget); setDescription(item.description || ''); setNotice('Fiche enregistrée rechargée.'); }}>Ouvrir</button><button className="text-button" type="button" onClick={() => deleteSavedProject(item.id)}>Supprimer</button></div>)}</div>}
