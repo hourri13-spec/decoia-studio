@@ -67,7 +67,15 @@ function App() {
           <div className="hero-actions"><a className="button button-primary" href="#studio">Créer mon projet <span>↗</span></a><a className="quiet-link" href="#inspirations">Voir les inspirations</a></div>
           <div className="trust-row"><span className="check">✓</span> Conseils déco personnalisés <span className="dot">·</span> Démonstration sans paiement</div>
         </div>
-        <div className="hero-photo-note"><span>01 / INSPIRATION</span><strong>La beauté des matières naturelles</strong><small>Bois clair · Lin · Tons doux</small></div>
+        <form className="hero-quick-form" onSubmit={submitIdea}>
+          <h3>Créez votre projet déco</h3><p>Quelques informations pour préparer votre fiche personnalisée.</p>
+          <label htmlFor="quick-room">Pièce</label><select id="quick-room" value={room} onChange={e=>setRoom(e.target.value)}>{['Salon','Chambre','Cuisine','Salle de bain','Extérieur'].map(x=><option key={x}>{x}</option>)}</select>
+          <label htmlFor="quick-style">Style</label><select id="quick-style" value={style} onChange={e=>setStyle(e.target.value)}>{styles.map(x=><option key={x}>{x}</option>)}</select>
+          <label htmlFor="quick-budget">Budget</label><select id="quick-budget" value={budget} onChange={e=>setBudget(e.target.value)}><option>Petit budget</option><option>Modéré</option><option>Confortable</option><option>Je ne sais pas encore</option></select>
+          <label htmlFor="quick-description">Vos envies</label><textarea id="quick-description" rows="2" value={description} onChange={e=>setDescription(e.target.value)} placeholder="Couleurs, matières, besoins…"/>
+          <button className="button button-primary submit" type="submit">Générer ma fiche déco ↗</button>
+          <small className="hero-form-foot">Conseils personnalisés · Sans paiement</small>
+        </form>
       </section>
       <section className="benefits" id="fonctionnement">
         <div><span className="benefit-icon">✳</span><strong>Explorez des styles</strong><p>Du Japandi au bohème, trouvez votre univers.</p></div>
