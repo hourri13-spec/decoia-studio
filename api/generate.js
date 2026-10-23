@@ -53,9 +53,7 @@ export default async function handler(req, res) {
         messages: [
           { role: 'system', content: 'Tu produis des recommandations de décoration en français au format JSON strict.' },
           { role: 'user', content: prompt }
-        ],
-        temperature: 0.7,
-        max_tokens: 700
+        ]
       }),
       signal: AbortSignal.timeout(30000)
     });
