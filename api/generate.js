@@ -6,6 +6,7 @@ export default async function handler(req, res) {
 
   const apiKey = process.env.POLLINATIONS_API_KEY;
   if (!apiKey) {
+    console.error('[DécoIA] POLLINATIONS_API_KEY absente dans l’environnement Vercel.');
     return res.status(503).json({ error: 'Le service IA n’est pas configuré sur le serveur.' });
   }
 
@@ -50,6 +51,8 @@ export default async function handler(req, res) {
     });
 
     if (!upstream.ok) {
+      // Journaliser uniquement le statut HTTP : ne jamais journaliser la clé API ni les en-têtes.
+      console.error('[DécoIA] Le fournisseur IA a répondu avec HTTP', upstream.status);
       const statusMessages = {
         401: 'La clé API a été refusée. Vérifie la clé enregistrée dans Vercel.',
         403: 'Le fournisseur refuse cette clé ou ce modèle. Vérifie les autorisations et l’accès au modèle.',
@@ -87,6 +90,7 @@ export default async function handler(req, res) {
     res.setHeader('Cache-Control', 'no-store');
     return res.status(200).json(normalized);
   } catch (error) {
+    console.error('[DécoIA] Échec de l’appel IA :', error?.name || 'Erreur', error?.message || 'aucun détail');
     return res.status(502).json({ error: 'Impossible de joindre le service IA pour le moment.' });
   }
 }
