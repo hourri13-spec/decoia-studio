@@ -36,6 +36,21 @@ function App() {
     try { localStorage.setItem('decoia-saved-projects', JSON.stringify(next)); } catch {}
   }
 
+  async function generateRoomPhoto() {
+    const response = await fetch('/api/image', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ room, style, description })
+    });
+    if (!response.ok) {
+      const data = await response.json().catch(() => ({}));
+      throw new Error(data.error || 'La photo n’a pas pu être générée.');
+    }
+    const blob = await response.blob();
+    if (!blob.type.startsWith('image/')) throw new Error('Le service n’a pas renvoyé une image.');
+    return URL.createObjectURL(blob);
+  }
+
   async function submitIdea(e) {
     e.preventDefault();
     setIsGenerating(true);
@@ -63,11 +78,23 @@ function App() {
       const data = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(data.error || 'Le serveur IA a refusé la demande.');
       if (!data || !data.advice) throw new Error('Réponse IA incomplète');
-      setProject({ room, style, budget, description, advice: data.advice, budgetAdvice: data.budgetAdvice || budgets[budget], palette: data.palette || '', layoutTips: data.layoutTips || '', shoppingList: data.shoppingList || '', generatedByAI: true });
-      setNotice('Votre proposition a été générée par l’IA. Vérifiez toujours les mesures et la faisabilité avant tout achat.');
+      let photoUrl = '';
+      let photoError = '';
+      try { photoUrl = await generateRoomPhoto(); }
+      catch (imageError) { photoError = imageError?.message || 'La photo n’a pas pu être générée.'; }
+      setProject({ room, style, budget, description, advice: data.advice, budgetAdvice: data.budgetAdvice || budgets[budget], palette: data.palette || '', layoutTips: data.layoutTips || '', shoppingList: data.shoppingList || '', generatedByAI: true, photoUrl });
+      setNotice(photoUrl
+        ? 'Votre fiche et votre photo IA sont prêtes. Vérifiez toujours les mesures et la faisabilité avant tout achat.'
+        : 'La fiche texte est prête, mais la photo a échoué : ' + photoError);
     } catch (error) {
-      setProject({ room, style, budget, description, advice: fallback[style], budgetAdvice: budgets[budget], palette: '', layoutTips: '', shoppingList: '', generatedByAI: false });
-      setNotice('La génération IA a échoué : ' + (error?.message || 'erreur inconnue') + ' Voici une fiche de démonstration ; aucune réponse IA réelle n’a été générée.');
+      let photoUrl = '';
+      let photoError = '';
+      try { photoUrl = await generateRoomPhoto(); }
+      catch (imageError) { photoError = imageError?.message || 'la photo a échoué'; }
+      setProject({ room, style, budget, description, advice: fallback[style], budgetAdvice: budgets[budget], palette: '', layoutTips: '', shoppingList: '', generatedByAI: false, photoUrl });
+      setNotice('La génération du texte IA a échoué : ' + (error?.message || 'erreur inconnue') + '. ' +
+        (photoUrl ? 'Une photo IA a tout de même été créée.' : 'La photo a aussi échoué : ' + photoError) +
+        ' La fiche texte affichée est une démonstration.');
     } finally {
       setIsGenerating(false);
     }
@@ -117,7 +144,7 @@ function App() {
         </div>
       </section>
       <section className="studio-section" id="studio">
-        <div className="section-heading"><div className="eyebrow">LE STUDIO CRÉATIF</div><h2>Votre prochaine idée<br/><i>commence ici.</i></h2><p>Décrivez votre pièce et recevez une première fiche de conseils personnalisés. La génération d’images IA sera ajoutée séparément.</p></div>
+        <div className="section-heading"><div className="eyebrow">LE STUDIO CRÉATIF</div><h2>Votre prochaine idée<br/><i>commence ici.</i></h2><p>Décrivez votre pièce et recevez des conseils ainsi qu’une photo d’inspiration générée par l’IA.</p></div>
         <form className="studio-card" onSubmit={submitIdea}>
           <div className="form-title"><span className="number">01</span><div><h3>Personnalisons votre projet</h3><p>Quelques détails pour définir votre ambiance.</p></div></div>
           <label>Quelle pièce souhaitez-vous aménager ?</label>
@@ -133,6 +160,7 @@ function App() {
           {project && <div className="project-result" aria-live="polite">
             <div className="eyebrow">VOTRE FICHE D’INSPIRATION {project.generatedByAI ? "· IA" : "· DÉMO"}</div>
             <h3>{project.room} · style {project.style}</h3>
+            {project.photoUrl && <div className="generated-photo-wrap"><img className="generated-photo" src={project.photoUrl} alt={'Photo d’inspiration IA pour ' + project.room + ', style ' + project.style} /><a className="button button-outline photo-download" href={project.photoUrl} download={'decoia-' + project.room.toLowerCase().replace(/\\s+/g, '-') + '.jpg'}>Télécharger la photo</a></div>}
             <p><strong>Direction déco</strong><br/>{project.advice}</p>
             <p><strong>Conseil budget — {project.budget}</strong><br/>{project.budgetAdvice}</p>
             {project.palette && <p><strong>Palette de couleurs suggérée</strong><br/>{project.palette}</p>}{project.layoutTips && <p><strong>Agencement conseillé</strong><br/>{project.layoutTips}</p>}{project.shoppingList && <p><strong>Liste d’idées à prévoir</strong><br/>{project.shoppingList}</p>}{project.description && <p><strong>Vos envies</strong><br/>{project.description}</p>}
