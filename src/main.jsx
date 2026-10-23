@@ -10,6 +10,9 @@ function App() {
   const [description, setDescription] = useState('');
   const [notice, setNotice] = useState('');
   const [showLogin, setShowLogin] = useState(false);
+  const [accountEmail, setAccountEmail] = useState('');
+  const [accountNotice, setAccountNotice] = useState('');
+  const [paymentNotice, setPaymentNotice] = useState('');
   const [project, setProject] = useState(null);
   const [savedProjects, setSavedProjects] = useState(() => {
     try { return JSON.parse(localStorage.getItem('decoia-saved-projects') || '[]'); } catch { return []; }
@@ -53,10 +56,10 @@ function App() {
   return <div className="app">
     <header className="nav">
       <a className="brand" href="#accueil"><span className="brand-mark">D</span><span>DécoIA <em>Studio</em></span></a>
-      <nav><a href="#fonctionnement">Fonctionnement</a><a href="#studio">Le studio</a></nav>
-      <button className="button button-outline" onClick={() => setShowLogin(!showLogin)}>Espace client</button>
+      <nav><a href="#fonctionnement">Découvrir</a><a href="#studio">Créer un projet</a><a href="#tarifs">Tarifs</a><a href="#publicite">Publicité</a></nav>
+      <button className="button button-outline" onClick={() => { setShowLogin(!showLogin); setAccountNotice(""); }}>Créer un compte</button>
     </header>
-    {showLogin && <div className="login-note"><strong>Espace client — démonstration</strong><p>La connexion sécurisée sera ajoutée lors de la configuration du service d’authentification. Ce prototype ne collecte aucun mot de passe.</p><button className="text-button" onClick={() => setShowLogin(false)}>Fermer</button></div>}
+    {showLogin && <div className="account-panel" id="compte"><button className="account-close" type="button" onClick={() => setShowLogin(false)} aria-label="Fermer">×</button><div className="eyebrow">ESPACE CLIENT</div><h2>Créez votre compte DécoIA</h2><p>Préparez votre espace personnel pour retrouver vos projets et vos inspirations.</p><form onSubmit={e => { e.preventDefault(); setAccountNotice("L’inscription n’est pas encore activée : aucun compte n’a été créé et aucune donnée n’a été envoyée. La connexion sécurisée doit être raccordée avant ouverture."); }}><label htmlFor="account-email">Adresse e-mail</label><input id="account-email" type="email" required value={accountEmail} onChange={e => setAccountEmail(e.target.value)} placeholder="vous@exemple.fr"/><button className="button button-primary submit" type="submit">Continuer</button></form><small>Formulaire de démonstration — ne saisis pas de mot de passe ni d’information sensible.</small>{accountNotice && <div className="notice" role="status">{accountNotice}</div>}</div>}
     <main id="accueil">
       <section className="hero hero-photo">
         <div className="hero-photo-bg" role="img" aria-label="Salon lumineux aux tons naturels, canapé beige et plantes vertes"></div>
@@ -82,6 +85,7 @@ function App() {
         <div><span className="benefit-icon">⌂</span><strong>Pensez chaque pièce</strong><p>Salon, chambre, cuisine et plus encore.</p></div>
         <div><span className="benefit-icon">✧</span><strong>Faites mûrir vos idées</strong><p>Des pistes pour imaginer un espace à votre image.</p></div>
       </section>
+      <section className="ad-slot" id="publicite" aria-label="Emplacement publicitaire"><div className="ad-slot-tag">PUBLICITÉ</div><div><strong>Emplacement publicitaire</strong><p>Zone réservée aux annonces partenaires. Les publicités sont désactivées pour le moment.</p></div><span className="ad-slot-size">Bannière · 970 × 90</span></section>
       <section className="inspiration-gallery" id="inspirations">
         <div className="gallery-heading"><div><div className="eyebrow">TROUVEZ VOTRE AMBIANCE</div><h2>Des idées pour chaque pièce.</h2><p>Quelques univers pour vous aider à imaginer votre intérieur.</p></div><a className="quiet-link" href="#studio">Personnaliser mon projet ↗</a></div>
         <div className="gallery-grid">
@@ -118,9 +122,21 @@ function App() {
           <p className="privacy">Prototype de démonstration : vos informations ne sont pas envoyées à un serveur.</p>
         </form>
       </section>
+      <section className="pricing-section" id="tarifs">
+        <div className="pricing-heading"><div className="eyebrow">DES OFFRES SIMPLES</div><h2>Choisissez votre formule.</h2><p>Commencez par 3 jours offerts, puis choisissez la durée qui vous convient.</p><div className="trial-pill">✦ 3 jours offerts pour découvrir DécoIA Studio</div></div>
+        <div className="pricing-grid">
+          <article className="price-card"><span className="price-duration">1 semaine</span><h3>9,99 €</h3><p>Pour tester un projet sur une courte durée.</p><button className="button button-outline" type="button" onClick={() => setPaymentNotice("Le paiement n’est pas encore connecté. Aucun achat ni prélèvement ne sera effectué.")}>Choisir cette offre</button></article>
+          <article className="price-card price-featured"><span className="price-badge">POPULAIRE</span><span className="price-duration">1 mois</span><h3>19,99 €</h3><p>Pour imaginer et faire évoluer plusieurs pièces.</p><button className="button button-primary" type="button" onClick={() => setPaymentNotice("Le paiement n’est pas encore connecté. Aucun achat ni prélèvement ne sera effectué.")}>Choisir cette offre</button></article>
+          <article className="price-card"><span className="price-duration">3 mois</span><h3>39,99 €</h3><p>Pour avancer sur plusieurs projets d’aménagement.</p><button className="button button-outline" type="button" onClick={() => setPaymentNotice("Le paiement n’est pas encore connecté. Aucun achat ni prélèvement ne sera effectué.")}>Choisir cette offre</button></article>
+          <article className="price-card"><span className="price-duration">1 an</span><h3>59,99 €</h3><p>Pour garder l’inspiration toute l’année.</p><button className="button button-outline" type="button" onClick={() => setPaymentNotice("Le paiement n’est pas encore connecté. Aucun achat ni prélèvement ne sera effectué.")}>Choisir cette offre</button></article>
+        </div>
+        {paymentNotice && <div className="notice pricing-notice" role="status">{paymentNotice}</div>}
+        <p className="pricing-footnote">Tarifs proposés à titre de configuration. Le paiement, les conditions d’abonnement et la règle de fin des 3 jours offerts devront être configurés et vérifiés avant toute vente réelle.</p>
+      </section>
+      <section className="ad-slot ad-slot-bottom" aria-label="Emplacement publicitaire secondaire"><div className="ad-slot-tag">PUBLICITÉ</div><div><strong>Emplacement publicitaire secondaire</strong><p>Zone réservée à un futur format annonce. Aucun suivi publicitaire n’est actif.</p></div><span className="ad-slot-size">Rectangle · 300 × 250</span></section>
       <section className="cta"><div><div className="eyebrow">DÉCOIA STUDIO</div><h2>Faites place à l’inspiration.</h2><p>Une maison qui vous ressemble commence par une idée.</p></div><a className="button button-light" href="#studio">Imaginer mon projet ↗</a></section>
     </main>
-    <footer><a className="brand" href="#accueil"><span className="brand-mark">D</span><span>DécoIA <em>Studio</em></span></a><span>Prototype de travail · Paiements et publicités désactivés</span><span>© 2026 DécoIA Studio</span></footer>
+    <footer><a className="brand" href="#accueil"><span className="brand-mark">D</span><span>DécoIA <em>Studio</em></span></a><span>Prototype en cours · Paiement et publicités non activés</span><span>© 2026 DécoIA Studio</span></footer>
   </div>;
 }
 createRoot(document.getElementById('root')).render(<App />);
