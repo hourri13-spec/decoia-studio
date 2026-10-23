@@ -13,6 +13,8 @@ function App() {
   const [accountEmail, setAccountEmail] = useState('');
   const [accountNotice, setAccountNotice] = useState('');
   const [paymentNotice, setPaymentNotice] = useState('');
+  const [selectedPlan, setSelectedPlan] = useState(null);
+  const [trialConsent, setTrialConsent] = useState(false);
   const [project, setProject] = useState(null);
   const [savedProjects, setSavedProjects] = useState(() => {
     try { return JSON.parse(localStorage.getItem('decoia-saved-projects') || '[]'); } catch { return []; }
@@ -125,11 +127,16 @@ function App() {
       <section className="pricing-section" id="tarifs">
         <div className="pricing-heading"><div className="eyebrow">DES OFFRES SIMPLES</div><h2>Choisissez votre formule.</h2><p>Choisissez votre formule et confirmez votre essai. Aucun paiement pendant les 3 jours offerts ; si vous ne résiliez pas à temps, la formule choisie sera facturée à la fin de l’essai.</p><div className="trial-pill">✦ Formule à choisir et à valider avant l’essai</div></div>
         <div className="pricing-grid">
-          <article className="price-card"><span className="price-duration">1 semaine</span><h3>9,99 €</h3><p>3 jours offerts, puis 9,99 € si vous ne résiliez pas à temps.</p><button className="button button-outline" type="button" onClick={() => setPaymentNotice("Vous avez choisi l’offre 1 semaine (9,99 € après les 3 jours offerts). La validation et le paiement sécurisé ne sont pas encore disponibles ; aucun abonnement ni prélèvement n’est créé.")}>Choisir cette offre</button></article>
-          <article className="price-card price-featured"><span className="price-badge">POPULAIRE</span><span className="price-duration">1 mois</span><h3>19,99 €</h3><p>3 jours offerts, puis 19,99 € si vous ne résiliez pas à temps.</p><button className="button button-primary" type="button" onClick={() => setPaymentNotice("Vous avez choisi l’offre 1 mois (19,99 € après les 3 jours offerts). La validation et le paiement sécurisé ne sont pas encore disponibles ; aucun abonnement ni prélèvement n’est créé.")}>Choisir cette offre</button></article>
-          <article className="price-card"><span className="price-duration">3 mois</span><h3>39,99 €</h3><p>3 jours offerts, puis 39,99 € si vous ne résiliez pas à temps.</p><button className="button button-outline" type="button" onClick={() => setPaymentNotice("Vous avez choisi l’offre 3 mois (39,99 € après les 3 jours offerts). La validation et le paiement sécurisé ne sont pas encore disponibles ; aucun abonnement ni prélèvement n’est créé.")}>Choisir cette offre</button></article>
-          <article className="price-card"><span className="price-duration">1 an</span><h3>59,99 €</h3><p>3 jours offerts, puis 59,99 € si vous ne résiliez pas à temps.</p><button className="button button-outline" type="button" onClick={() => setPaymentNotice("Vous avez choisi l’offre 1 an (59,99 € après les 3 jours offerts). La validation et le paiement sécurisé ne sont pas encore disponibles ; aucun abonnement ni prélèvement n’est créé.")}>Choisir cette offre</button></article>
+          {[{id:'week',duration:'1 semaine',price:'9,99 €'},{id:'month',duration:'1 mois',price:'19,99 €',featured:true},{id:'quarter',duration:'3 mois',price:'39,99 €'},{id:'year',duration:'1 an',price:'59,99 €'}].map(plan => <article className={`price-card ${plan.featured?'price-featured':''} ${selectedPlan?.id===plan.id?'price-selected':''}`} key={plan.id}>{plan.featured && <span className="price-badge">POPULAIRE</span>}<span className="price-duration">{plan.duration}</span><h3>{plan.price}</h3><p>3 jours offerts, puis {plan.price} si vous ne résiliez pas avant la fin de l’essai.</p><button className={selectedPlan?.id===plan.id?'button button-primary':'button button-outline'} type="button" onClick={() => { setSelectedPlan(plan); setTrialConsent(false); setPaymentNotice(''); }}>Choisir cette offre</button></article>)}
         </div>
+        {selectedPlan && <div className="trial-confirmation">
+          <div className="eyebrow">ÉTAPE SUIVANTE · VOTRE CHOIX</div>
+          <h3>Formule sélectionnée : {selectedPlan.duration}</h3>
+          <p>Vous bénéficiez de 3 jours d’essai. À la fin de l’essai, le prix prévu est de <strong>{selectedPlan.price}</strong> si vous n’avez pas résilié à temps. Aucun paiement n’est effectué sur cette démonstration.</p>
+          <label className="trial-consent"><input type="checkbox" checked={trialConsent} onChange={e=>setTrialConsent(e.target.checked)}/> Je comprends la durée de l’essai, le prix de ma formule et la nécessité de résilier avant la fin des 3 jours pour éviter la facturation.</label>
+          <button className="button button-primary submit" type="button" disabled={!trialConsent} onClick={() => setPaymentNotice("Démonstration uniquement : votre choix et votre consentement ont été testés à l’écran, mais aucun essai, compte, abonnement ou paiement n’a été créé. Le système sécurisé doit être connecté avant de proposer cette offre à de vrais clients.")}>Valider mon choix (démo)</button>
+          <small>Cette étape simule le parcours. Elle ne démarre pas réellement les 3 jours et ne collecte aucune carte bancaire.</small>
+        </div>}
         {paymentNotice && <div className="notice pricing-notice" role="status">{paymentNotice}</div>}
         <p className="pricing-footnote">Le fonctionnement prévu est : choisir une formule, accepter les conditions et valider l’essai de 3 jours. Sans résiliation avant la fin de l’essai, le tarif de la formule choisie sera facturé. Le paiement récurrent sécurisé, les rappels et la résiliation en ligne doivent être configurés et testés avant l’ouverture des abonnements.</p>
       </section>
