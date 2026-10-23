@@ -64,7 +64,9 @@ export default async function handler(req, res) {
       // Journaliser uniquement le statut HTTP : ne jamais journaliser la clé API ni les en-têtes.
       console.error('[DécoIA] Le fournisseur IA a répondu avec HTTP', upstream.status);
       const statusMessages = {
+        400: 'La demande a été rejetée par le fournisseur. Vérifie les paramètres envoyés.',
         401: 'La clé API a été refusée. Vérifie la clé enregistrée dans Vercel.',
+        402: 'Le compte du fournisseur IA ne dispose pas de crédits suffisants pour cette génération. Vérifie le solde et les limites du compte Pollinations.',
         403: 'Le fournisseur refuse cette clé ou ce modèle. Vérifie les autorisations et l’accès au modèle.',
         404: 'Le modèle ou le point d’accès demandé est introuvable.',
         429: 'La limite d’utilisation ou de crédits du fournisseur a été atteinte.',
