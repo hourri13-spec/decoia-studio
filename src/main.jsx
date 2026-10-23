@@ -60,14 +60,14 @@ function App() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ room, style, budget, description })
       });
-      if (!response.ok) throw new Error('API indisponible');
-      const data = await response.json();
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data.error || 'Le serveur IA a refusé la demande.');
       if (!data || !data.advice) throw new Error('Réponse IA incomplète');
       setProject({ room, style, budget, description, advice: data.advice, budgetAdvice: data.budgetAdvice || budgets[budget], palette: data.palette || '', layoutTips: data.layoutTips || '', shoppingList: data.shoppingList || '', generatedByAI: true });
       setNotice('Votre proposition a été générée par l’IA. Vérifiez toujours les mesures et la faisabilité avant tout achat.');
-    } catch {
+    } catch (error) {
       setProject({ room, style, budget, description, advice: fallback[style], budgetAdvice: budgets[budget], palette: '', layoutTips: '', shoppingList: '', generatedByAI: false });
-      setNotice('Le service IA n’est pas encore connecté à cet hébergement. Voici une fiche de conseils de démonstration ; aucune réponse IA réelle n’a été générée.');
+      setNotice('La génération IA a échoué : ' + (error?.message || 'erreur inconnue') + ' Voici une fiche de démonstration ; aucune réponse IA réelle n’a été générée.');
     } finally {
       setIsGenerating(false);
     }
