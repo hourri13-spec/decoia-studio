@@ -28,7 +28,7 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Les choix du projet sont invalides.' });
   }
 
-  const safeDescription = typeof description === 'string' ? description.slice(0, 700).replace(/[\\u0000-\\u001F]/g, ' ') : '';
+  const safeDescription = typeof description === 'string' ? description.slice(0, 700).replace(/[\u0000-\u001F]/g, ' ') : '';
   const prompt = [
     'Tu es un conseiller en décoration intérieure prudent et créatif. Réponds en français.',
     'Propose des idées réalistes, sans inventer de dimensions, de prix précis ni de garanties.',
@@ -39,7 +39,7 @@ export default async function handler(req, res) {
     'Style : ' + style,
     'Budget : ' + budget,
     'Demandes du client : ' + (safeDescription || 'Aucune précision supplémentaire.')
-  ].join('\\n');
+  ].join('\n');
 
   try {
     const upstream = await fetch('https://gen.pollinations.ai/v1/chat/completions', {
@@ -81,7 +81,7 @@ export default async function handler(req, res) {
       return res.status(502).json({ error: 'La réponse IA est incomplète.' });
     }
 
-    const cleaned = content.replace(/^\\s*```(?:json)?\\s*/i, '').replace(/\\s*```\\s*$/, '');
+    const cleaned = content.replace(/^\s*\`\`\`(?:json)?\s*/i, '').replace(/\s*\`\`\`\s*$/, '');
     const firstBrace = cleaned.indexOf('{');
     const lastBrace = cleaned.lastIndexOf('}');
     if (firstBrace < 0 || lastBrace <= firstBrace) {
