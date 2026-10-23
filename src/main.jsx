@@ -11,6 +11,24 @@ function App() {
   const [notice, setNotice] = useState('');
   const [showLogin, setShowLogin] = useState(false);
   const [project, setProject] = useState(null);
+  const [savedProjects, setSavedProjects] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('decoia-saved-projects') || '[]'); } catch { return []; }
+  });
+
+  function saveProject() {
+    if (!project) return;
+    const item = { ...project, id: Date.now(), savedAt: new Date().toLocaleDateString('fr-FR') };
+    const next = [item, ...savedProjects].slice(0, 12);
+    setSavedProjects(next);
+    try { localStorage.setItem('decoia-saved-projects', JSON.stringify(next)); setNotice('Projet enregistré sur cet appareil.'); }
+    catch { setNotice('Le navigateur n’a pas permis l’enregistrement. Vous pouvez imprimer la fiche en PDF.'); }
+  }
+
+  function deleteSavedProject(id) {
+    const next = savedProjects.filter(item => item.id !== id);
+    setSavedProjects(next);
+    try { localStorage.setItem('decoia-saved-projects', JSON.stringify(next)); } catch {}
+  }
 
   function submitIdea(e) {
     e.preventDefault();
@@ -82,8 +100,9 @@ function App() {
             <p><strong>Direction déco</strong><br/>{project.advice}</p>
             <p><strong>Conseil budget — {project.budget}</strong><br/>{project.budgetAdvice}</p>
             {project.description && <p><strong>Vos envies</strong><br/>{project.description}</p>}
-            <button className="button button-outline" type="button" onClick={() => window.print()}>Imprimer / enregistrer en PDF</button>
+            <div className="result-actions"><button className="button button-primary" type="button" onClick={saveProject}>Enregistrer ce projet</button><button className="button button-outline" type="button" onClick={() => window.print()}>Imprimer / enregistrer en PDF</button></div>
           </div>}
+          {savedProjects.length > 0 && <div className="saved-projects"><div className="eyebrow">MES PROJETS ENREGISTRÉS</div><p className="saved-note">Enregistrés uniquement dans ce navigateur, sur cet appareil.</p>{savedProjects.map(item => <div className="saved-project" key={item.id}><div><strong>{item.room} · {item.style}</strong><small>{item.budget} · enregistré le {item.savedAt}</small></div><button className="text-button" type="button" onClick={() => { setProject(item); setRoom(item.room); setStyle(item.style); setBudget(item.budget); setDescription(item.description || ''); setNotice('Fiche enregistrée rechargée.'); }}>Ouvrir</button><button className="text-button" type="button" onClick={() => deleteSavedProject(item.id)}>Supprimer</button></div>)}</div>}
           <p className="privacy">Prototype de démonstration : vos informations ne sont pas envoyées à un serveur.</p>
         </form>
       </section>
