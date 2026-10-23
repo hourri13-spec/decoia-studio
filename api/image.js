@@ -17,7 +17,7 @@ export default async function handler(req, res) {
   }
 
   const safeDescription = typeof description === 'string'
-    ? description.slice(0, 350).replace(/[\\u0000-\\u001F]/g, ' ')
+    ? description.slice(0, 350).replace(/[\x00-\x1F]/g, ' ')
     : '';
   const prompt = [
     'Photorealistic professional interior design photography, realistic room, natural daylight, tasteful styling, high detail, wide angle, no people, no text, no watermark.',
