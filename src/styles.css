@@ -119,3 +119,9 @@ a,button,select,textarea{touch-action:manipulation}
 .benefit-icon{background:#F1E2D9;color:#A95F43}
 .price-selected{border-color:#B66A4C;background:#FBF5F1}
 .trial-consent input{accent-color:#B66A4C}
+
+/* Generated AI interior photo */
+.generated-photo-wrap{margin:18px 0 22px;padding:10px;border:1px solid #e9e6dd;border-radius:8px;background:#faf8f2}
+.generated-photo{display:block;width:100%;max-height:560px;object-fit:cover;aspect-ratio:4/3;border-radius:5px;background:#eee8df}
+.photo-download{margin-top:10px;width:100%;background:#fffefa}
+@media print{.generated-photo-wrap{break-inside:avoid}.photo-download{display:none}}
