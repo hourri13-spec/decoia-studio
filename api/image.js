@@ -32,19 +32,26 @@ export default async function handler(req, res) {
     const upstream = await fetch(imageUrl, {
       method: 'GET',
       headers: { 'Authorization': 'Bearer ' + apiKey },
-      signal: AbortSignal.timeout(60000)
+      signal: AbortSignal.timeout(55000)
     });
 
     if (!upstream.ok) {
       console.error('[DécoIA] Échec génération image, HTTP', upstream.status);
       const messages = {
         400: 'La demande d’image a été rejetée. Essaie une description plus simple.',
-        401: 'La clé API a été refusée par le service d’images.',
+        401: 'La clé API a été refusée par le service d’images. Vérifie la clé dans Vercel.',
         402: 'Le compte Pollinations ne dispose pas de crédits suffisants pour créer une image.',
         403: 'La clé API ne possède pas l’autorisation de créer des images.',
-        429: 'La limite de génération d’images est atteinte. Réessaie plus tard.'
+        404: 'Le modèle d’image demandé est introuvable ou indisponible.',
+        429: 'La limite de génération d’images est atteinte. Réessaie plus tard.',
+        500: 'Le service d’images rencontre une erreur temporaire.',
+        502: 'Le fournisseur d’images est temporairement indisponible.',
+        503: 'Le fournisseur d’images est temporairement indisponible.'
       };
-      return res.status(502).json({ error: messages[upstream.status] || 'Le service de génération d’images est temporairement indisponible.' });
+      return res.status(502).json({
+        error: messages[upstream.status] || 'Le service de génération d’images a refusé la demande.',
+        providerStatus: upstream.status
+      });
     }
 
     const contentType = upstream.headers.get('content-type') || 'image/jpeg';
@@ -64,7 +71,11 @@ export default async function handler(req, res) {
     res.setHeader('Content-Disposition', 'inline; filename="decoia-inspiration.jpg"');
     return res.status(200).send(bytes);
   } catch (error) {
-    console.error('[DécoIA] Échec image :', error?.name || 'Erreur');
-    return res.status(502).json({ error: 'La création de la photo a échoué. Vérifie les crédits du service IA puis réessaie.' });
+    const errorName = error?.name || 'Erreur';
+    console.error('[DécoIA] Échec image :', errorName);
+    if (errorName === 'TimeoutError' || errorName === 'AbortError') {
+      return res.status(504).json({ error: 'La création de l’image prend trop de temps. Réessaie dans quelques instants.' });
+    }
+    return res.status(502).json({ error: 'Connexion au service d’images impossible. Vérifie la configuration réseau et la clé API côté Vercel.' });
   }
 }
