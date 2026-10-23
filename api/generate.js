@@ -50,7 +50,17 @@ export default async function handler(req, res) {
     });
 
     if (!upstream.ok) {
-      return res.status(502).json({ error: 'Le fournisseur IA ne répond pas correctement. Réessaie plus tard.' });
+      const statusMessages = {
+        401: 'La clé API a été refusée. Vérifie la clé enregistrée dans Vercel.',
+        403: 'Le fournisseur refuse cette clé ou ce modèle. Vérifie les autorisations et l’accès au modèle.',
+        404: 'Le modèle ou le point d’accès demandé est introuvable.',
+        429: 'La limite d’utilisation ou de crédits du fournisseur a été atteinte.',
+        500: 'Le fournisseur IA rencontre une erreur temporaire.',
+        502: 'Le fournisseur IA est temporairement indisponible.',
+        503: 'Le fournisseur IA est temporairement indisponible.'
+      };
+      const message = statusMessages[upstream.status] || 'Le fournisseur IA a refusé la demande (HTTP ' + upstream.status + ').';
+      return res.status(502).json({ error: message, providerStatus: upstream.status });
     }
 
     const payload = await upstream.json();
