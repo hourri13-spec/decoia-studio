@@ -58,27 +58,31 @@ function App() {
     </header>
     {showLogin && <div className="login-note"><strong>Espace client — démonstration</strong><p>La connexion sécurisée sera ajoutée lors de la configuration du service d’authentification. Ce prototype ne collecte aucun mot de passe.</p><button className="text-button" onClick={() => setShowLogin(false)}>Fermer</button></div>}
     <main id="accueil">
-      <section className="hero">
-        <div className="hero-copy">
+      <section className="hero hero-photo">
+        <div className="hero-photo-bg" role="img" aria-label="Salon lumineux aux tons naturels, canapé beige et plantes vertes"></div>
+        <div className="hero-copy hero-photo-copy">
           <div className="eyebrow"><span></span> VOTRE INTÉRIEUR, VOTRE INSPIRATION</div>
-          <h1>Un nouvel intérieur.<br/><i>Mille possibilités.</i></h1>
-          <p className="lead">Imaginez des ambiances qui vous ressemblent et explorez de nouvelles idées pour chaque pièce de votre maison.</p>
-          <div className="hero-actions"><a className="button button-primary" href="#studio">Découvrir le studio <span>↗</span></a><a className="quiet-link" href="#fonctionnement">Comment ça marche ?</a></div>
-          <div className="trust-row"><span className="check">✓</span> Une inspiration adaptée à vos envies <span className="dot">·</span> Démonstration sans paiement</div>
+          <h1>Un intérieur qui<br/><i>vous ressemble.</i></h1>
+          <p className="lead">Explorez des ambiances chaleureuses, trouvez votre style et préparez votre projet pièce par pièce.</p>
+          <div className="hero-actions"><a className="button button-primary" href="#studio">Créer mon projet <span>↗</span></a><a className="quiet-link" href="#inspirations">Voir les inspirations</a></div>
+          <div className="trust-row"><span className="check">✓</span> Conseils déco personnalisés <span className="dot">·</span> Démonstration sans paiement</div>
         </div>
-        <div className="hero-art" role="img" aria-label="Illustration stylisée d'un salon chaleureux">
-          <div className="sun"></div><div className="window"><div></div><div></div><div></div><div></div></div>
-          <div className="plant"><i></i><i></i><i></i><i></i><b></b></div>
-          <div className="wall-frame"><span></span><span></span><span></span></div>
-          <div className="sofa"><div className="sofa-back"></div><div className="cushion one"></div><div className="cushion two"></div><div className="seat"></div><div className="sofa-leg l"></div><div className="sofa-leg r"></div></div>
-          <div className="table"><div></div></div><div className="rug"></div>
-          <div className="art-label"><span className="sparkle">✳</span><div><strong>Une ambiance qui vous ressemble</strong><small>Inspiration · Harmonie · Idées</small></div></div>
-        </div>
+        <div className="hero-photo-note"><span>01 / INSPIRATION</span><strong>La beauté des matières naturelles</strong><small>Bois clair · Lin · Tons doux</small></div>
       </section>
       <section className="benefits" id="fonctionnement">
         <div><span className="benefit-icon">✳</span><strong>Explorez des styles</strong><p>Du Japandi au bohème, trouvez votre univers.</p></div>
         <div><span className="benefit-icon">⌂</span><strong>Pensez chaque pièce</strong><p>Salon, chambre, cuisine et plus encore.</p></div>
         <div><span className="benefit-icon">✧</span><strong>Faites mûrir vos idées</strong><p>Des pistes pour imaginer un espace à votre image.</p></div>
+      </section>
+      <section className="inspiration-gallery" id="inspirations">
+        <div className="gallery-heading"><div><div className="eyebrow">TROUVEZ VOTRE AMBIANCE</div><h2>Des idées pour chaque pièce.</h2><p>Quelques univers pour vous aider à imaginer votre intérieur.</p></div><a className="quiet-link" href="#studio">Personnaliser mon projet ↗</a></div>
+        <div className="gallery-grid">
+          <a className="gallery-card" href="#studio" onClick={() => setRoom('Salon')}><img src="https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=900&q=85" alt="Salon contemporain chaleureux aux tons naturels" loading="lazy"/><span className="gallery-card-label"><strong>Salon</strong><small>Convivial & apaisant</small></span></a>
+          <a className="gallery-card" href="#studio" onClick={() => setRoom('Chambre')}><img src="https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=900&q=85" alt="Chambre élégante avec matières douces" loading="lazy"/><span className="gallery-card-label"><strong>Chambre</strong><small>Douceur & repos</small></span></a>
+          <a className="gallery-card" href="#studio" onClick={() => setRoom('Cuisine')}><img src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=900&q=85" alt="Cuisine moderne aux finitions naturelles" loading="lazy"/><span className="gallery-card-label"><strong>Cuisine</strong><small>Fonctionnelle & lumineuse</small></span></a>
+          <a className="gallery-card" href="#studio" onClick={() => setRoom('Salle de bain')}><img src="https://images.unsplash.com/photo-1620626011761-996317b8d101?auto=format&fit=crop&w=900&q=85" alt="Salle de bain moderne aux tons pierre" loading="lazy"/><span className="gallery-card-label"><strong>Salle de bain</strong><small>Simple & sereine</small></span></a>
+          <a className="gallery-card" href="#studio" onClick={() => setRoom('Extérieur')}><img src="https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=900&q=85" alt="Espace de vie ouvert sur un extérieur verdoyant" loading="lazy"/><span className="gallery-card-label"><strong>Nature & extérieur</strong><small>Dedans-dehors</small></span></a>
+        </div>
       </section>
       <section className="studio-section" id="studio">
         <div className="section-heading"><div className="eyebrow">LE STUDIO CRÉATIF</div><h2>Votre prochaine idée<br/><i>commence ici.</i></h2><p>Décrivez votre pièce et recevez une première fiche de conseils personnalisés. La génération d’images IA sera ajoutée séparément.</p></div>
