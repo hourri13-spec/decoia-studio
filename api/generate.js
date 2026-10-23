@@ -1,6 +1,16 @@
 export default async function handler(req, res) {
+  // Diagnostic public minimal : ne révèle jamais la clé ni aucune donnée du compte.
+  if (req.method === 'GET') {
+    res.setHeader('Cache-Control', 'no-store');
+    return res.status(200).json({
+      service: 'DécoIA Studio',
+      endpoint: 'api/generate',
+      methodForGeneration: 'POST',
+      apiKeyConfigured: Boolean(process.env.POLLINATIONS_API_KEY)
+    });
+  }
   if (req.method !== 'POST') {
-    res.setHeader('Allow', 'POST');
+    res.setHeader('Allow', 'GET, POST');
     return res.status(405).json({ error: 'Méthode non autorisée.' });
   }
 
