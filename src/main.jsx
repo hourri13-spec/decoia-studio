@@ -96,7 +96,7 @@ function App() {
           <label htmlFor="quick-style">Style</label><select id="quick-style" value={style} onChange={e=>setStyle(e.target.value)}>{styles.map(x=><option key={x}>{x}</option>)}</select>
           <label htmlFor="quick-budget">Budget</label><select id="quick-budget" value={budget} onChange={e=>setBudget(e.target.value)}><option>Petit budget</option><option>Modéré</option><option>Confortable</option><option>Je ne sais pas encore</option></select>
           <label htmlFor="quick-description">Vos envies</label><textarea id="quick-description" rows="2" value={description} onChange={e=>setDescription(e.target.value)} placeholder="Couleurs, matières, besoins…"/>
-          <button className="button button-primary submit" type="submit">{isGenerating ? "Génération en cours…" : "Générer ma fiche déco ↗"}</button>
+          <button className="button button-primary submit" type="submit" disabled={isGenerating}>{isGenerating ? "Génération en cours…" : "Générer ma fiche déco ↗"}</button>
           <small className="hero-form-foot">Conseils personnalisés · Sans paiement</small>
         </form>
       </section>
@@ -128,7 +128,7 @@ function App() {
           <select id="budget" value={budget} onChange={e=>setBudget(e.target.value)}><option>Petit budget</option><option>Modéré</option><option>Confortable</option><option>Je ne sais pas encore</option></select>
           <label htmlFor="description">Décrivez votre pièce et vos envies <span className="optional">Facultatif</span></label>
           <textarea id="description" rows="3" value={description} onChange={e=>setDescription(e.target.value)} placeholder="Ex. : salon lumineux, bois clair, rangements discrets, ambiance apaisante…"/>
-          <button className="button button-primary submit" type="submit">{isGenerating ? "Génération en cours…" : "Générer avec l’IA"} <span>↗</span></button>
+          <button className="button button-primary submit" type="submit" disabled={isGenerating}>{isGenerating ? "Génération en cours…" : "Générer avec l’IA"} <span>↗</span></button>
           {notice && <div className="notice" role="status">{notice}</div>}
           {project && <div className="project-result" aria-live="polite">
             <div className="eyebrow">VOTRE FICHE D’INSPIRATION {project.generatedByAI ? "· IA" : "· DÉMO"}</div>
@@ -139,7 +139,7 @@ function App() {
             <div className="result-actions"><button className="button button-primary" type="button" onClick={saveProject}>Enregistrer ce projet</button><button className="button button-outline" type="button" onClick={() => window.print()}>Imprimer / enregistrer en PDF</button></div>
           </div>}
           {savedProjects.length > 0 && <div className="saved-projects"><div className="eyebrow">MES PROJETS ENREGISTRÉS</div><p className="saved-note">Enregistrés uniquement dans ce navigateur, sur cet appareil.</p>{savedProjects.map(item => <div className="saved-project" key={item.id}><div><strong>{item.room} · {item.style}</strong><small>{item.budget} · enregistré le {item.savedAt}</small></div><button className="text-button" type="button" onClick={() => { setProject(item); setRoom(item.room); setStyle(item.style); setBudget(item.budget); setDescription(item.description || ''); setNotice('Fiche enregistrée rechargée.'); }}>Ouvrir</button><button className="text-button" type="button" onClick={() => deleteSavedProject(item.id)}>Supprimer</button></div>)}</div>}
-          <p className="privacy">Prototype de démonstration : vos informations ne sont pas envoyées à un serveur.</p>
+          <p className="privacy">Prototype en cours : si le service IA est activé, les choix de pièce, de style, de budget et votre description sont envoyés au serveur puis au fournisseur IA pour générer la fiche. Évitez d’y saisir des informations personnelles sensibles. Les projets enregistrés restent dans ce navigateur.</p>
         </form>
       </section>
       <section className="pricing-section" id="tarifs">
