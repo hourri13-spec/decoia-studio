@@ -49,7 +49,7 @@ export default async function handler(req, res) {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        model: 'openai/gpt-5-nano',
+        model: 'openai/gpt-5.4-nano',
         messages: [
           { role: 'system', content: 'Tu produis des recommandations de décoration en français au format JSON strict.' },
           { role: 'user', content: prompt }
