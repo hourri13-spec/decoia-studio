@@ -96,3 +96,15 @@ a,button,select,textarea{touch-action:manipulation}
 .ad-slot-bottom{max-width:850px;min-height:140px;margin:0 auto 50px}
 @media(max-width:950px){.pricing-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.price-card{padding:23px}.ad-slot{gap:14px}}
 @media(max-width:600px){.account-panel{padding:23px 19px}.pricing-section{padding:55px 0 45px}.pricing-grid{grid-template-columns:1fr;gap:12px}.price-card{padding:22px}.price-card p{min-height:0}.trial-pill{font-size:11px;line-height:1.5}.ad-slot{flex-direction:column;align-items:flex-start;padding:35px 18px 18px;gap:9px}.ad-slot-size{white-space:normal}.pricing-heading h2{font-size:36px}}
+
+
+/* Subscription selection demo */
+.price-selected{border:2px solid #71866a;background:#f8faf5}
+.trial-confirmation{max-width:760px;margin:24px auto 0;padding:26px;background:#fffefa;border:1px solid #dce3d5;border-radius:10px}
+.trial-confirmation h3{font:500 25px 'Playfair Display',serif;margin:10px 0}
+.trial-confirmation p{font-size:12px;line-height:1.75;color:#687064}
+.trial-consent{display:flex;align-items:flex-start;gap:10px;margin:18px 0;font-size:12px;line-height:1.65;color:#465143}
+.trial-consent input{flex:0 0 auto;margin-top:3px;accent-color:#71866a}
+.trial-confirmation .submit{width:auto;margin:0 0 12px}
+.trial-confirmation .submit:disabled{opacity:.45;cursor:not-allowed}
+.trial-confirmation>small{display:block;font-size:10px;line-height:1.6;color:#858b80}
