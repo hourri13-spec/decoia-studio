@@ -10,10 +10,26 @@ function App() {
   const [description, setDescription] = useState('');
   const [notice, setNotice] = useState('');
   const [showLogin, setShowLogin] = useState(false);
+  const [project, setProject] = useState(null);
 
   function submitIdea(e) {
     e.preventDefault();
-    setNotice('Maquette prête : la génération d’images IA n’est pas encore connectée. Aucune image n’a été générée.');
+    const suggestions = {
+      Japandi: 'Associez bois clair, lignes simples, textiles naturels et quelques objets artisanaux. Gardez des surfaces dégagées pour une ambiance calme.',
+      Scandinave: 'Privilégiez des tons lumineux, du bois naturel, des textiles doux et un éclairage chaleureux. Ajoutez quelques touches végétales.',
+      Contemporain: 'Misez sur une palette de deux ou trois couleurs, des meubles aux formes nettes et un éclairage en plusieurs points.',
+      Bohème: 'Superposez des matières naturelles, des coussins texturés, des fibres tressées et quelques plantes, en gardant une palette cohérente.',
+      Industriel: 'Combinez bois, métal noir et tons minéraux. Adoucissez l’ensemble avec un tapis, des rideaux et une lumière chaude.',
+      Nature: 'Construisez une palette inspirée de la nature : vert doux, beige et bois. Ajoutez des matières naturelles et des plantes adaptées à la luminosité.'
+    };
+    const budgets = {
+      'Petit budget': 'Commencez par réorganiser les meubles existants, puis changez les textiles et ajoutez quelques accessoires abordables.',
+      'Modéré': 'Répartissez le budget entre un élément central, un éclairage agréable et quelques textiles coordonnés.',
+      'Confortable': 'Vous pouvez envisager une pièce maîtresse de qualité, un éclairage travaillé et des rangements mieux adaptés.',
+      'Je ne sais pas encore': 'Avancez par étapes : définissez les priorités, mesurez la pièce et comparez les options avant tout achat.'
+    };
+    setProject({ room, style, budget, description, advice: suggestions[style], budgetAdvice: budgets[budget] });
+    setNotice('Votre fiche d’inspiration est prête. Ces conseils sont préparés dans le navigateur, pas générés par une IA.');
   }
 
   return <div className="app">
@@ -47,7 +63,7 @@ function App() {
         <div><span className="benefit-icon">✧</span><strong>Faites mûrir vos idées</strong><p>Des pistes pour imaginer un espace à votre image.</p></div>
       </section>
       <section className="studio-section" id="studio">
-        <div className="section-heading"><div className="eyebrow">LE STUDIO CRÉATIF</div><h2>Votre prochaine idée<br/><i>commence ici.</i></h2><p>Décrivez votre pièce et vos envies. Ce formulaire est une maquette : la génération d’images sera connectée dans une prochaine étape.</p></div>
+        <div className="section-heading"><div className="eyebrow">LE STUDIO CRÉATIF</div><h2>Votre prochaine idée<br/><i>commence ici.</i></h2><p>Décrivez votre pièce et recevez une première fiche de conseils personnalisés. La génération d’images IA sera ajoutée séparément.</p></div>
         <form className="studio-card" onSubmit={submitIdea}>
           <div className="form-title"><span className="number">01</span><div><h3>Personnalisons votre projet</h3><p>Quelques détails pour définir votre ambiance.</p></div></div>
           <label>Quelle pièce souhaitez-vous aménager ?</label>
@@ -60,6 +76,14 @@ function App() {
           <textarea id="description" rows="3" value={description} onChange={e=>setDescription(e.target.value)} placeholder="Ex. : salon lumineux, bois clair, rangements discrets, ambiance apaisante…"/>
           <button className="button button-primary submit" type="submit">Préparer mon idée <span>↗</span></button>
           {notice && <div className="notice" role="status">{notice}</div>}
+          {project && <div className="project-result" aria-live="polite">
+            <div className="eyebrow">VOTRE FICHE D’INSPIRATION</div>
+            <h3>{project.room} · style {project.style}</h3>
+            <p><strong>Direction déco</strong><br/>{project.advice}</p>
+            <p><strong>Conseil budget — {project.budget}</strong><br/>{project.budgetAdvice}</p>
+            {project.description && <p><strong>Vos envies</strong><br/>{project.description}</p>}
+            <button className="button button-outline" type="button" onClick={() => window.print()}>Imprimer / enregistrer en PDF</button>
+          </div>}
           <p className="privacy">Prototype de démonstration : vos informations ne sont pas envoyées à un serveur.</p>
         </form>
       </section>
