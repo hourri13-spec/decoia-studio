@@ -28,7 +28,7 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Les choix du projet sont invalides.' });
   }
 
-  const safeDescription = typeof description === 'string' ? description.slice(0, 700).replace(/[\u0000-\u001F]/g, ' ') : '';
+  const safeDescription = typeof description === 'string' ? description.slice(0, 700).replace(/[\\u0000-\\u001F]/g, ' ') : '';
   const prompt = [
     'Tu es un conseiller en décoration intérieure prudent et créatif. Réponds en français.',
     'Propose des idées réalistes, sans inventer de dimensions, de prix précis ni de garanties.',
@@ -39,7 +39,7 @@ export default async function handler(req, res) {
     'Style : ' + style,
     'Budget : ' + budget,
     'Demandes du client : ' + (safeDescription || 'Aucune précision supplémentaire.')
-  ].join('\n');
+  ].join('\\n');
 
   try {
     const upstream = await fetch('https://gen.pollinations.ai/v1/chat/completions', {
@@ -59,7 +59,6 @@ export default async function handler(req, res) {
     });
 
     if (!upstream.ok) {
-      // Journaliser uniquement le statut HTTP : ne jamais journaliser la clé API ni les en-têtes.
       console.error('[DécoIA] Le fournisseur IA a répondu avec HTTP', upstream.status);
       const statusMessages = {
         400: 'La demande a été rejetée par le fournisseur. Vérifie les paramètres envoyés.',
@@ -82,7 +81,7 @@ export default async function handler(req, res) {
       return res.status(502).json({ error: 'La réponse IA est incomplète.' });
     }
 
-    const cleaned = content.replace(/^\s*```(?:json)?\s*/i, '').replace(/\s*```\s*$/, '');
+    const cleaned = content.replace(/^\\s*```(?:json)?\\s*/i, '').replace(/\\s*```\\s*$/, '');
     const firstBrace = cleaned.indexOf('{');
     const lastBrace = cleaned.lastIndexOf('}');
     if (firstBrace < 0 || lastBrace <= firstBrace) {
@@ -100,7 +99,11 @@ export default async function handler(req, res) {
     res.setHeader('Cache-Control', 'no-store');
     return res.status(200).json(normalized);
   } catch (error) {
-    console.error('[DécoIA] Échec de l’appel IA :', error?.name || 'Erreur', error?.message || 'aucun détail');
-    return res.status(502).json({ error: 'Impossible de joindre le service IA pour le moment.' });
+    const errorName = error?.name || 'Erreur';
+    console.error('[DécoIA] Échec de l’appel IA :', errorName);
+    if (errorName === 'TimeoutError' || errorName === 'AbortError') {
+      return res.status(504).json({ error: 'Le service IA met trop de temps à répondre. Réessaie dans quelques instants.' });
+    }
+    return res.status(502).json({ error: 'Connexion au fournisseur IA impossible. Vérifie la configuration réseau et la clé API côté Vercel.' });
   }
 }
