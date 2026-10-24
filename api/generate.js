@@ -104,6 +104,6 @@ export default async function handler(req, res) {
     if (errorName === 'TimeoutError' || errorName === 'AbortError') {
       return res.status(504).json({ error: 'Le service IA met trop de temps à répondre. Réessaie dans quelques instants.' });
     }
-    return res.status(502).json({ error: 'Connexion au fournisseur IA impossible. Vérifie la configuration réseau et la clé API côté Vercel.' });
+    return res.status(502).json({ error: 'Connexion au fournisseur IA impossible. Vérifie la configuration réseau et la clé API côté Vercel.', diagnosticCode: errorName });
   }
 }
