@@ -76,6 +76,6 @@ export default async function handler(req, res) {
     if (errorName === 'TimeoutError' || errorName === 'AbortError') {
       return res.status(504).json({ error: 'La création de l’image prend trop de temps. Réessaie dans quelques instants.' });
     }
-    return res.status(502).json({ error: 'Connexion au service d’images impossible. Vérifie la configuration réseau et la clé API côté Vercel.' });
+    return res.status(502).json({ error: 'Connexion au service d’images impossible. Vérifie la configuration réseau et la clé API côté Vercel.', diagnosticCode: errorName });
   }
 }
